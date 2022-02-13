@@ -11,7 +11,6 @@ export const reqTradeMark = (page, limit) => request.get(`/admin/product/baseTra
 // 修改品牌的接口
 // /admin/product/baseTrademark/update  携带3个参数：id logoUrl tmName
 // 切记：需要带上id
-
 export const reqAddOrUpdateTradeMark = (tradeMark) => {
     if (tradeMark.id) {
         return request({ url: '/admin/product/baseTrademark/update', method: 'put', data: tradeMark })
@@ -19,3 +18,7 @@ export const reqAddOrUpdateTradeMark = (tradeMark) => {
         return request({ url: ' /admin/product/baseTrademark/save', method: 'post', data: tradeMark })
     }
 }
+
+// 删除品牌的接口
+// /admin/product/baseTrademark/remove/{id}
+export const reqDelteTradeMark = (id) => request({ url: `/admin/product/baseTrademark/remove/${id}`, method: 'delete' })

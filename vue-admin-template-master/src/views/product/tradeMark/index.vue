@@ -8,7 +8,7 @@
       @click="showDialog"
       >添加</el-button
     >
-    <!-- 表格组件属性：
+    <!-- table组件属性：
       data：表格组件将来需要展示的数据---数组类型
       border：表格边框
 
@@ -40,7 +40,7 @@
             @click="updateTradeMark(row)"
             >修改</el-button
           >
-          <el-button type="danger" icon="el-icon-delete" size="mini"
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteTradeMark(row)"
             >删除</el-button
           >
         </template>
@@ -73,14 +73,18 @@
 
     <!-- 对话框
     visible.sync：是否显示 Dialog，支持 .sync 修饰符
+    :rules="rules" : Form 提供表单验证的功能，只需要通过 rules 属性传入约定的验证规则，并将 Form-Item 的 prop 属性设置为需校验的字段名即可
      -->
-    <el-dialog :title="tmForm.id?'修改品牌':'添加品牌'" :visible.sync="dialogFormVisible">
+    <el-dialog
+      :title="tmForm.id ? '修改品牌' : '添加品牌'"
+      :visible.sync="dialogFormVisible"
+    >
       <!-- form表单  ：model：收集表单的数据-->
-      <el-form style="width: 80%" :model="tmForm">
-        <el-form-item label="品牌名称" label-width="100px">
+      <el-form style="width: 80%" :model="tmForm" :rules="rules" ref="ruleForm">
+        <el-form-item label="品牌名称" label-width="100px" prop="tmName">
           <el-input autocomplete="off" v-model="tmForm.tmName"></el-input>
         </el-form-item>
-        <el-form-item label="品牌名称" label-width="100px">
+        <el-form-item label="品牌名称" label-width="100px" prop="logoUrl">
           <!-- 
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload" -->
@@ -133,7 +137,18 @@ export default {
       // 收集品牌的信息 :
       tmForm: {
         logoUrl: "",
-        tmName: ""
+        tmName: "",
+      },
+      // 表单验证的规则
+      rules: {
+        // 品牌名称的验证规则 ： required：必须要校验字段 message：提示信息 tigger：用户行为才导致触发）
+        tmName: [
+          { required: true, message: "请输入活动名称", trigger: "blur" },
+          // min：品牌名称的长度3-5
+          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
+        ],
+        // 品牌的logoUrl验证的规则
+        logoUrl: [{ required: true, message: "请选择图片"}],
       },
     };
   },
@@ -177,7 +192,7 @@ export default {
       this.dialogFormVisible = true;
       // row:当前用户选中这个品牌信息
       // 将已有的数据赋值给tmform进行展示
-      this.tmForm = {...row}
+      this.tmForm = { ...row };
     },
     // 上传图片的相关回调
     handleAvatarSuccess(res, file) {
@@ -201,20 +216,62 @@ export default {
       return isJPG && isLt2M;
     },
     // 确定按钮（添加品牌、修改品牌）
-    async addOrUpdateTradeMark() {
-      this.dialogFormVisible=false //隐藏对话框
-      // 发请求（添加品牌、修改品牌）
-      let result = await this.$API.trademark.reqAddOrUpdateTradeMark(this.tmForm)
-      if(result.code ==200){
-        this.$message(this.tmForm.id?'修改成功':'添加成功')
-        this.getPageList()
-      }
-      // console.log(result);
+    addOrUpdateTradeMark() {
+      //  当全部验证字段通过，再去书写业务逻辑
+      this.$refs.ruleForm.validate(async (success) => {
+        // console.log(success);
+        // 如果全部字段符合字段
+        if (success) {
+          this.dialogFormVisible = false; //隐藏对话框
+          // 发请求（添加品牌、修改品牌）
+          let result = await this.$API.trademark.reqAddOrUpdateTradeMark(
+            this.tmForm
+          );
+          if (result.code == 200) {
+            // 弹出信息
+            this.$message({
+              type: "success",
+              message: this.tmForm.id ? "修改品牌成功" : "添加品牌成功",
+            });
+            this.getPageList();
+          }
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
     },
+    // 删除品牌的操作
+    deleteTradeMark(row){
+      this.$confirm(`你确定删除${row.tmName}?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          // 点击确认按钮的时候触发
+          let result = await this.$API.trademark.reqDeleteTradeMark(row.id)
+          // 如果删除成功
+          console.log(result);
+          if(result.code){
+              this.$message({
+              type: 'success',
+              message: '删除成功!'
+          });
+          // 再次获取品牌列表展示
+          this.getPageList(this.list.length>1?this.page:this.page-1)
+          }
+        }).catch(() => {
+          // 点击取消的时候触发
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+    }
   },
 };
 </script>
-
+ 
 <style>
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
