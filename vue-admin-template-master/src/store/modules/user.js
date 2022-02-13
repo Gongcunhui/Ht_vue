@@ -14,6 +14,7 @@ const state = getDefaultState()
 
 const mutations = {
     RESET_STATE: (state) => {
+        // 用户数据初始化
         Object.assign(state, getDefaultState())
     },
     SET_TOKEN: (state, token) => {
@@ -63,17 +64,27 @@ const actions = {
     },
 
     // user logout
-    logout({ commit, state }) {
-        return new Promise((resolve, reject) => {
-            logout(state.token).then(() => {
-                removeToken() // must remove  token  first
-                resetRouter()
-                commit('RESET_STATE')
-                resolve()
-            }).catch(error => {
-                reject(error)
-            })
-        })
+    async logout({ commit, state }) {
+        // return new Promise((resolve, reject) => {
+        //     logout(state.token).then(() => {
+        //         removeToken() // must remove  token  first
+        //         resetRouter()
+        //         commit('RESET_STATE')
+        //         resolve()
+        //     }).catch(error => {
+        //         reject(error)
+        //     })
+        // })
+        let result = await logout(state.token)
+            // console.log(result);
+        if (result.code == 20000) {
+            removeToken() //清除本地存储的token
+            resetRouter()
+            commit('RESET_STATE') //置空用户数据
+            return 'ok'
+        } else {
+            return Promise.reject(new Error('faile'))
+        }
     },
 
     // remove token
