@@ -24,20 +24,25 @@ import '@/permission' // permission control
  * please remove it before going online ! ! !
  */
 if (process.env.NODE_ENV === 'production') {
-  const { mockXHR } = require('../mock')
-  mockXHR()
+    const { mockXHR } = require('../mock')
+    mockXHR()
 }
 
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })
-// 如果想要中文版 element-ui，按如下方式声明
-// Vue.use(ElementUI)
+    // 如果想要中文版 element-ui，按如下方式声明
+    // Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
+// 引入相关api接口 挂在vue原型对象上 这样任意组件都就可以使用这些接口 不需要引入
+import API from '@/api'
+// console.log(API);
+Vue.prototype.$API = API
+
 new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
+    el: '#app',
+    router,
+    store,
+    render: h => h(App)
 })
