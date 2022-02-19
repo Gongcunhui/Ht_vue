@@ -15,8 +15,11 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+// 注册全局组件
 import CategorySelect from '@/components/CategorySelect'
 Vue.component(CategorySelect.name, CategorySelect)
+import HintButton from '@/components/HintButton'
+Vue.component(HintButton.name, HintButton)
 
 /**
  * If you don't want to use mock-server
