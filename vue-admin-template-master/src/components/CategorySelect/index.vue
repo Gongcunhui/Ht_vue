@@ -6,13 +6,14 @@
         <el-select
           placeholder="请选择"
           v-model="cForm.catagory1Id"
-          @change="handler1"
+          @change="handler1" 
+          :disabled="show"
         >
           <el-option
             :label="c1.name"
             :value="c1.id"
             v-for="c1 in list1"
-            :key="c1.id"
+            :key="c1.id" 
           ></el-option>
         </el-select>
       </el-form-item>
@@ -20,7 +21,8 @@
         <el-select
           placeholder="请选择"
           v-model="cForm.catagory2Id"
-          @change="handler2"
+          @change="handler2" 
+          :disabled="show"
         >
           <el-option
             :label="c2.name"
@@ -34,7 +36,8 @@
         <el-select
           placeholder="请选择"
           v-model="cForm.catagory3Id"
-          @change="handler3"
+          @change="handler3" 
+          :disabled="show"
         >
           <el-option
             :label="c3.name"
@@ -51,6 +54,7 @@
 <script>
 export default {
   name: "CategorySelect",
+  props:['show'],
   data() {
     return {
       //一级分类的数据
@@ -82,7 +86,7 @@ export default {
     },
     //  一级分类的select回调（当一级分类的option发生改变时 获取二级分类的数据）
     async handler1() {
-      // 清除23级数据（保证每次选1级的时候 23级总是数据）
+      // 清除23级数据（保证每次选1级的时候 23级总是kong数据）
       this.list2 = [];
       this.list3 = [];
       this.cForm.catagory2Id = "";
