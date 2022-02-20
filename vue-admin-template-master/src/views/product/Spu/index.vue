@@ -82,7 +82,7 @@
       <!-- 添加或修改spu-->
       <SpuForm v-show="scence == 1" @scence0="scence0" ref="spu"></SpuForm>
       <!-- 添加sku -->
-      <SkuForm v-show="scence == 2"></SkuForm>
+      <SkuForm v-show="scence == 2" ref="sku"></SkuForm>
     </el-card>
   </div>
 </template>
@@ -193,6 +193,8 @@ export default {
       // console.log(123);
       // 切换场景为2
       this.scence=2
+      // 通知子组件发请求
+      this.$refs.sku.getData()
     }
   },
 };
